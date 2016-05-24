@@ -12,48 +12,79 @@ namespace Nexus_Bowling_Exercise
         {
             while (scoreboard.frameNumber < 10)
             {
-                Console.Clear();
-
                 // Calc throws
                 int[] throws = new int[2];
                 throws[0] = rand.Next(11);
                 throws[1] = rand.Next(11 - throws[0]);
 
-                Console.WriteLine("Frame: " + (scoreboard.frameNumber + 1));
-                Console.WriteLine();
+                //Tenth frame
+                if (scoreboard.frameNumber == 9)
+                {
+                    int[] extraThrow = new int[3];
 
-                scoreboard.RecordFrame(throws);
+                    // Strike
+                    if (throws[0] == 10)
+                    {
+                        extraThrow[0] = 10;
+                        extraThrow[1] = rand.Next(11);
+                        extraThrow[2] = rand.Next(11 - extraThrow[1]);
+                    }
+                    // Spare
+                    else if (throws[0] + throws[1] == 10)
+                    {
+                        extraThrow[0] = throws[0];
+                        extraThrow[1] = throws[1];
+                        extraThrow[2] = rand.Next(11);
+                    }
+                    // Nada
+                    else
+                    {
+                        extraThrow[0] = throws[0];
+                        extraThrow[1] = throws[1];
+                        extraThrow[2] = 0;
+                    }
 
-                // Scoreboard
-                Console.WriteLine("\t| 1  |\t| 2  |\t| 3  |\t| 4  |\t| 5  |\t| 6  |\t| 7  |\t| 8  |\t| 9  |\t| 10 |");
-                Console.WriteLine("        ------------------------------------------------------------------------------");
-                for (int i = 0; i < 10; i++)
-                    Console.Write("\t| " + scoreboard.frameTotals[i] + "  |");
-
-                Console.WriteLine();
-                Console.WriteLine();
-
-                Console.WriteLine("Throw #1: " + throws[0] + "\t" + "Throw #2: " + throws[1]);
-
-                Console.WriteLine();
-                Console.WriteLine();
-
-                Console.WriteLine("Total score: " + scoreboard.Score);
-
-                Console.ReadLine();
+                    scoreboard.RecordFrame(extraThrow);
+                }
+                else
+                    scoreboard.RecordFrame(throws);
             }
 
-            //Console.ReadLine();
+            Console.Clear();
+
+            int totalScore = scoreboard.Score;
+
+            Console.WriteLine();
+
+            // Scoreboard
+            Console.WriteLine("\t| 1  |\t| 2  |\t| 3  |\t| 4  |\t| 5  |\t| 6  |\t| 7  |\t| 8  |\t| 9  |\t| 10 |");
+            Console.WriteLine("        ------------------------------------------------------------------------------");
+            for (int i = 0; i < scoreboard.frameNumber; i++)
+                Console.Write("\t|" + scoreboard.throwTracker[i][0] + "," + scoreboard.throwTracker[i][1] + "|");
+
+            Console.WriteLine(scoreboard.extraThrow);
+
+            Console.WriteLine();
+
+            for (int i = 0; i < scoreboard.frameNumber; i++)
+                Console.Write("\t| " + scoreboard.frameTotals[i] + " |");
+
+            Console.WriteLine();
+            Console.WriteLine();
+
+            Console.WriteLine("Total score: " + totalScore);
+
+            Console.ReadLine();
         }
 
         static void Main(string[] args)
         {
-
+            /*
             Console.WriteLine("Welcome to the Bowling Game!!!");
             Console.WriteLine("Press any key to start the game");
 
             Console.ReadLine();
-
+            */
             Scoreboard scoreboard = new Scoreboard();
             Random rand = new Random(DateTime.Now.Millisecond);
 

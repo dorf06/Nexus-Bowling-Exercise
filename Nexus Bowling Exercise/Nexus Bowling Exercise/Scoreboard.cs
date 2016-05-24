@@ -9,32 +9,36 @@ namespace Nexus_Bowling_Exercise
     class Scoreboard : ISimpleBowlingGame
     {
         // Scoring variables
-        public int[] frameTotals = new int[10];
+        public int[] frameTotals;
 
         // Tracking
         public int frameNumber;
-        private int[][] throwTracker = new int[10][];
-
-        // Throw counters
-        int[] scoresStrike = new int[3];
-        int[] scoresSpare = new int[2];
-        int throwsStrike;
-        int throwsSpare;
-
-        // Special Tracking
-        
+        public int[][] throwTracker;
+        public int extraThrow;
 
         // Constructor
         public Scoreboard ()
         {
             // Set frames
             frameNumber = 0;
+
+            extraThrow = 0;
+
+            frameTotals = new int[10];
+            throwTracker = new int[10][];
         }
 
         public void RecordFrame(params int[] throws)
         {
             throwTracker[frameNumber] = throws;
-            
+            /*
+            if (frameNumber == 9)
+            {
+                throwTracker[9][0] = throws[0];
+                throwTracker[9][1] = throws[1];
+                extraThrow = throws[2];
+            }
+            */
             frameNumber++;
         }
 
@@ -42,29 +46,56 @@ namespace Nexus_Bowling_Exercise
         {
             get
             {
-                for (int i = 0; i < frameNumber; i++)
+                for (int tempFrame = 0; tempFrame < frameNumber; tempFrame++)
                 {
-                     // Check for strike
-                     if (throwTracker[frameNumber][0] == 10)
+                    if (tempFrame < 9)
                     {
-                        int strikeScore = 0;
+                        // Check for strike
+                        if (throwTracker[tempFrame][0] == 10)
+                        {
+                            // Add next two throws to score
+                            // Check if next throw is a strike
+                            if (throwTracker[tempFrame + 1][0] != 10)
+                                // Not a strike, so add next throws like normal
+                                frameTotals[tempFrame] = 10 + throwTracker[tempFrame + 1][0] + throwTracker[tempFrame + 1][1];
+                            else
+                                // Next throw is strike, add 10, then add frame after first throw (Doesnt matter what it is)
+                                frameTotals[tempFrame] = 10 + 10 + throwTracker[tempFrame + 2][0];
+                        }
 
-                        // Add next two throws to score
+                        // Check for spare
+                        if ((throwTracker[tempFrame][0] + throwTracker[tempFrame][1]) == 10)
+                        {
+                            // Add next throw
+                            frameTotals[tempFrame] = 10 + throwTracker[tempFrame + 1][0];
+                        }
+
+                        // Add pins
+                        frameTotals[tempFrame] = throwTracker[tempFrame][0] + throwTracker[tempFrame][1];
                     }
-
-                    // Check for spare
-                    if ((throwTracker[frameNumber][0] + throwTracker[frameNumber][1]) == 10)
+                    // 10th frame
+                    else
                     {
+                        // Check for strike
+                        if (throwTracker[tempFrame][0] == 10)
+                        {
+                            frameTotals[9] = 10 + throwTracker[9][1] + extraThrow;
+                        }
 
+                        // Check for spare
+                        if ((throwTracker[tempFrame][0] + throwTracker[tempFrame][1]) == 10)
+                        {
+                            // Add next throw
+                            frameTotals[tempFrame] = 10 + extraThrow;
+                        }
 
-                        // Add next throw
+                        // Add pins
+                        frameTotals[tempFrame] = throwTracker[tempFrame][0] + throwTracker[tempFrame][1];
                     }
-
-                    // Add pins
-                    frameTotals[frameNumber] = throwTracker[frameNumber][0] + throwTracker[frameNumber][1];
                 }
 
-                return frameTotals.Sum();
+                // Add the frames and the extra throw
+                return frameTotals.Sum() + extraThrow;
             }
         }
     }
