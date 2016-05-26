@@ -14,15 +14,12 @@ namespace Nexus_Bowling_Exercise
         // Tracking
         public int frameNumber;
         public int[][] throwTracker;
-        public int extraThrow;
 
         // Constructor
         public Scoreboard ()
         {
             // Set frames
             frameNumber = 0;
-
-            extraThrow = 0;
 
             frameTotals = new int[10];
             throwTracker = new int[10][];
@@ -31,14 +28,7 @@ namespace Nexus_Bowling_Exercise
         public void RecordFrame(params int[] throws)
         {
             throwTracker[frameNumber] = throws;
-            /*
-            if (frameNumber == 9)
-            {
-                throwTracker[9][0] = throws[0];
-                throwTracker[9][1] = throws[1];
-                extraThrow = throws[2];
-            }
-            */
+            
             frameNumber++;
         }
 
@@ -59,19 +49,27 @@ namespace Nexus_Bowling_Exercise
                                 // Not a strike, so add next throws like normal
                                 frameTotals[tempFrame] = 10 + throwTracker[tempFrame + 1][0] + throwTracker[tempFrame + 1][1];
                             else
-                                // Next throw is strike, add 10, then add frame after first throw (Doesnt matter what it is)
-                                frameTotals[tempFrame] = 10 + 10 + throwTracker[tempFrame + 2][0];
+                            {
+                                // Turns out I was wrong, different logic for 9th frame strike
+                                if (tempFrame != 8)
+                                    // Next throw is strike, add 10, then add frame after first throw (Doesnt matter what it is)
+                                    frameTotals[tempFrame] = 10 + 10 + throwTracker[tempFrame + 2][0];
+                                else
+                                    // 9th frame strike, 10th frame strike, then take second throw of 10th
+                                    frameTotals[tempFrame] = 10 + 10 + throwTracker[9][1];
+                            }
                         }
 
                         // Check for spare
-                        if ((throwTracker[tempFrame][0] + throwTracker[tempFrame][1]) == 10)
+                        else if ((throwTracker[tempFrame][0] + throwTracker[tempFrame][1]) == 10)
                         {
                             // Add next throw
                             frameTotals[tempFrame] = 10 + throwTracker[tempFrame + 1][0];
                         }
 
-                        // Add pins
-                        frameTotals[tempFrame] = throwTracker[tempFrame][0] + throwTracker[tempFrame][1];
+                        else
+                            // Add pins
+                            frameTotals[tempFrame] = throwTracker[tempFrame][0] + throwTracker[tempFrame][1];
                     }
                     // 10th frame
                     else
@@ -79,23 +77,24 @@ namespace Nexus_Bowling_Exercise
                         // Check for strike
                         if (throwTracker[tempFrame][0] == 10)
                         {
-                            frameTotals[9] = 10 + throwTracker[9][1] + extraThrow;
+                            frameTotals[9] = 10 + throwTracker[9][1] + throwTracker[9][2];
                         }
 
                         // Check for spare
-                        if ((throwTracker[tempFrame][0] + throwTracker[tempFrame][1]) == 10)
+                        else if ((throwTracker[tempFrame][0] + throwTracker[tempFrame][1]) == 10)
                         {
                             // Add next throw
-                            frameTotals[tempFrame] = 10 + extraThrow;
+                            frameTotals[tempFrame] = 10 + throwTracker[9][2];
                         }
 
-                        // Add pins
-                        frameTotals[tempFrame] = throwTracker[tempFrame][0] + throwTracker[tempFrame][1];
+                        else
+                            // Add pins
+                            frameTotals[tempFrame] = throwTracker[tempFrame][0] + throwTracker[tempFrame][1];
                     }
                 }
 
                 // Add the frames and the extra throw
-                return frameTotals.Sum() + extraThrow;
+                return frameTotals.Sum();
             }
         }
     }

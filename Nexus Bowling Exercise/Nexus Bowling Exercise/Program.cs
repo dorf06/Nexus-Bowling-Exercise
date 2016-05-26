@@ -6,10 +6,34 @@ using System.Threading.Tasks;
 
 namespace Nexus_Bowling_Exercise
 {
+    class LeaderBoard
+    {
+        private int highScore { get; set; }
+        private int averageScore { get; set; }
+
+        private List<int> pastGames { get; set; }
+
+        LeaderBoard ()
+        {
+            highScore = 0;
+            averageScore = 0;
+        }
+
+        void AddGame (int score)
+        {
+            pastGames.Add(score);
+
+            //averageScore = pastGames.Average();
+        }
+    }
+
     class Program
     {
-        static void GameLoop (Scoreboard scoreboard, Random rand)
+        static void GameLoop ()
         {
+            Scoreboard scoreboard = new Scoreboard();
+            Random rand = new Random(DateTime.Now.Millisecond);
+
             while (scoreboard.frameNumber < 10)
             {
                 // Calc throws
@@ -27,7 +51,12 @@ namespace Nexus_Bowling_Exercise
                     {
                         extraThrow[0] = 10;
                         extraThrow[1] = rand.Next(11);
-                        extraThrow[2] = rand.Next(11 - extraThrow[1]);
+
+                        // Check for strike on second throw
+                        if (extraThrow[1] == 10)
+                            extraThrow[2] = rand.Next(11);
+                        else
+                            extraThrow[2] = rand.Next(11 - extraThrow[1]);
                     }
                     // Spare
                     else if (throws[0] + throws[1] == 10)
@@ -62,7 +91,7 @@ namespace Nexus_Bowling_Exercise
             for (int i = 0; i < scoreboard.frameNumber; i++)
                 Console.Write("\t|" + scoreboard.throwTracker[i][0] + "," + scoreboard.throwTracker[i][1] + "|");
 
-            Console.WriteLine(scoreboard.extraThrow);
+            Console.WriteLine(scoreboard.throwTracker[9][2]);
 
             Console.WriteLine();
 
@@ -73,22 +102,19 @@ namespace Nexus_Bowling_Exercise
             Console.WriteLine();
 
             Console.WriteLine("Total score: " + totalScore);
-
+            
             Console.ReadLine();
         }
 
         static void Main(string[] args)
-        {
-            /*
+        {            
             Console.WriteLine("Welcome to the Bowling Game!!!");
             Console.WriteLine("Press any key to start the game");
 
             Console.ReadLine();
-            */
-            Scoreboard scoreboard = new Scoreboard();
-            Random rand = new Random(DateTime.Now.Millisecond);
-
-            GameLoop(scoreboard, rand);
+            
+            while (true)
+                GameLoop();
         }
     }
 }
